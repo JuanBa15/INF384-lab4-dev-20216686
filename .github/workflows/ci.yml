@@ -252,7 +252,7 @@ jobs:
                 --output text 2> /dev/null)"; then
               break
             fi
-            sleep 10
+            sleep 2
           done
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
@@ -291,7 +291,7 @@ jobs:
                 --output text 2> /dev/null)"; then
               break
             fi
-            sleep 10
+            sleep 2
           done
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
@@ -325,7 +325,7 @@ jobs:
                 --output text 2> /dev/null)"; then
               break
             fi
-            sleep 10
+            sleep 2
           done
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
