@@ -21,8 +21,9 @@ test('las respuestas son JSON', async ({ page }) => {
 });
 
 test('el navegador muestra el saldo de un usuario semilla', async ({ page }) => {
-  await page.goto('/saldo/carla');
-  const cuerpo = JSON.parse(await page.locator('body').innerText());
+  const r = await page.request.get('/saldo/carla');
+  expect(r.status()).toBe(200);
+  const cuerpo = await r.json();
   expect(cuerpo.usuario).toBe('carla');
   expect(typeof cuerpo.saldo).toBe('number');
 });
