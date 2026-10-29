@@ -1,37 +1,37 @@
 # Respuestas · Laboratorio 4
 Alumno: 20216686
-Presupuesto: [ ] min  Métrica DORA: [ ]
+Presupuesto: 13 min  Métrica DORA:  time to restore
 
 ## Parte 1 · Diagnóstico
-### Defecto 1: Falta de ejecución en paralelo entre las pruebas iniciales
-- Job y etapa: sast y sca, o puede que sea la dependencia entre ellos, en la etapa pre-build
-- Problema que causa en el pipeline: Falta de optimización en el flujo de ejecución en paralelo de los análisis iniciales, lo que retrasa la entrada al job `build-push`.
-- Link al commit:
-- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Ajustar configuración
+### Defecto 1
+- Job y etapa: smoke, etapa deploy (debe estar en post-deploy).
+- Problema que causa en el pipeline: El job smoke corría en paralelo con deploy (needs: build-push), haciendo que las pruebas de humo consultaran la Lambda antes de que el despliegue del nuevo código hubiera finalizado.
+- Link al commit: https://github.com/JuanBa15/INF384-lab4-dev-20216686/commit/eff4202c9b2d28727249261898d1a6bab0cda3c2
+- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): mover de etapa
 - Evidencia (dato observado, con link al run o fragmento de la salida local): 
-### Defecto 2: Las pruebas de integración se ejecutan sin aislamiento en la base de datos
-- Job y etapa: integration en la etapa pre-build.
-- Problema que causa en el pipeline: Acoplamiento de estado en la base de datos SQLite entre pruebas sin limpieza de datos, ocasionando resultados no deterministas.
-- Link al commit:
+### Defecto 2
+- Job y etapa: integration, etapa pre-build.
+- Problema que causa en el pipeline: Falta de aislamiento en /tmp/wallet.db. Las pruebas modifican saldos sin reiniciar la BD, provocando fallos en ejecuciones consecutivas por acumulación de estado.
+- Link al commit: https://github.com/JuanBa15/INF384-lab4-dev-20216686/commit/d61e2f1cb67c4b642ec52ae7e0dc768c8cb41f32
 - Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Modificar tests
 - Evidencia (dato observado, con link al run o fragmento de la salida local):
-### Defecto 3: Instalación redundante o innecesaria de navegadores en test:e2e
-- Job y etapa: e2e en la etapa post-deploy.
-- Problema que causa en el pipeline: Descarga e instalación innecesaria del navegador Chromium (`playwright install`) para pruebas que son 100% de API HTTP, desperdiciando tiempo del pipeline.
-- Link al commit:
-- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Eliminar / Ajustar configuración
+### Defecto 3
+- Job y etapa: e2e, etapa post-deploy.
+- Problema que causa en el pipeline: Descarga e instalación redundante de Chromium (`npx playwright install --with-deps chromium`), desperdiciando ~1.5 min en un suite que evalúa peticiones HTTP REST.
+- Link al commit: https://github.com/JuanBa15/INF384-lab4-dev-20216686/commit/3f3a5d7ff84977ad7a22c710545d2bde5b1c7742    https://github.com/JuanBa15/INF384-lab4-dev-20216686/commit/4189223bce9a1252d286df99662306e461cfbc83
+- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Eliminar / Modificar tests
 - Evidencia (dato observado, con link al run o fragmento de la salida local):
-### Defecto 4: Script de pruebas de humo sin tolerancia a fallos transitorios / bucle de espera bloqueante
-- Job y etapa: smoke en la etapa post-deploy.
-- Problema que causa en el pipeline: Tiempos de espera excesivos en los reintentos de polling del script `smoke.sh` y en la obtención de la URL de Lambda, ralentizando la verificación post-despliegue.
-- Link al commit:
+### Defecto 4
+- Job y etapa: load, etapa post-deploy.
+- Problema que causa en el pipeline: La etapa de carga constante en k6 estaba configurada en 10 minutos (10m), desperdiciando 6 minutos del presupuesto de tiempo de ejecución del pipeline.
+- Link al commit: https://github.com/JuanBa15/INF384-lab4-dev-20216686/commit/c1611b50d8710ddcdb617c355f451f8bab0933fc
+- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Modificar tests
+- Evidencia (dato observado, con link al run o fragmento de la salida local):
+### Defecto 5
+- Job y etapa: smoke, e2e, load, etapa post-deploy.
+- Problema que causa en el pipeline: Tiempos de retardo excesivos (sleep 10 y sleep 5) durante la resolución de URL de Lambda y peticiones de salud, demorando innecesariamente la fase post-despliegue.
+- Link al commit: https://github.com/JuanBa15/INF384-lab4-dev-20216686/commit/53e1246f6b75dff22f8d02ead1ef9fa676a40a25      https://github.com/JuanBa15/INF384-lab4-dev-20216686/commit/979065ca5c51b008f3c9b000fdc68936cf1a24ac
 - Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Ajustar configuración / Modificar tests
-- Evidencia (dato observado, con link al run o fragmento de la salida local):
-### Defecto 5: Redundancia de comandos y falta de uso eficiente del script en package.json
-- Job y etapa: unit e integration en la etapa pre-build.
-- Problema que causa en el pipeline: Descarga redundante e instalación desacoplada de dependencias en cada job individual sin optimizar el uso de caché o scripts del paquete.
-- Link al commit:
-- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Ajustar configuración
 - Evidencia (dato observado, con link al run o fragmento de la salida local):
 
 ## Parte 2 · Implementación
