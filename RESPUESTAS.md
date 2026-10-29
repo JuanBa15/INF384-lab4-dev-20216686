@@ -42,46 +42,57 @@ Presupuesto: 13 min  Métrica DORA:  time to restore
 - Link al run fallido: https://github.com/JuanBa15/INF384-lab4-dev-20216686/actions/runs/40964751918
 
 ## Parte 3 · Decisión bajo restricción
-Link al run medido:
+Link al run medido: https://github.com/JuanBa15/INF384-lab4-dev-20216686/actions/runs/40962927950
 
 | Job | Duración (min:seg) |
 |---|---|
-| unit | |
-| integration | |
-| sast | |
-| sca | |
-| build-push | |
-| deploy | |
-| smoke | |
-| e2e | |
-| load | |
-| **Total** | |
+| unit | 0:12 |
+| integration | 0:12 |
+| sast | 2:40 |
+| sca | 0:20 |
+| build-push | 0:45 |
+| deploy | 1:15 |
+| smoke | 0:10 |
+| e2e | 0:20 |
+| load | 6:10 |
+| **Total** | 12:04 |
 
 Resultado de load en ese run:
 | Métrica | Valor |
 |---|---|
-| p90 | |
-| p95 | |
-| Máximo | |
-| Tasa de error | |
-| Requests por segundo | |
+| p90 | 50.35 ms |
+| p95 | 52.38 ms |
+| Máximo | 254.79 ms |
+| Tasa de error | 0.00% |
+| Requests por segundo | 46.20 req/s |
 
-Conclusión sobre el comportamiento bajo carga:
+Conclusión sobre el comportamiento bajo carga: Monedero Andino demuestra una alta capacidad de respuesta y estabilidad bajo la carga simulada (hasta 30 VUs concurrentes). Registra una latencia mediana de 41.65 ms y un p95 de 52.38 ms con 0.00% de tasa de error procesando 46.20 req/s. La latencia máxima de 254.79 ms corresponde al cold start inicial de la función AWS Lambda, estabilizándose rápidamente en régimen permanente con valores inferiores a 55 ms.
 
 SLO propuesto (percentil, valor, ventana) y justificación:
+- **SLO propuesto**: Latencia p95 < 200 ms en una ventana móvil de 30 días (en CI: evaluado en cada run del job `load`).
+- **Justificación**: El p95 medido fue de 52.38 ms. Establecer un SLO de 200 ms otorga un margen de seguridad adecuado (~4x sobre el baseline) para absorber la variabilidad normal de los runners compartidos de GitHub Actions y pequeñas fluctuaciones de red/AWS Lambda, evitando falsos positivos que detengan el pipeline. Se configura `SLO_P95: 200` en `ci.yml`.
 
 SLA propuesto y diferencia con el SLO:
+- **SLA propuesto**: Latencia p95 < 300 ms en ventana mensual con disponibilidad del 99.5%.
+- **Diferencia**: El SLO es un objetivo interno del equipo de ingeniería para detectar degradaciones tempranas antes de impactar al usuario final. El SLA es el compromiso contractual externo con clientes/negocio que implica penalizaciones comerciales. El SLA incluye una holgura respecto al SLO (300 ms vs 200 ms) para permitir a operaciones reaccionar y mitigar un incidente antes de incurrir en incumplimiento de contrato.
 
 Cambios para cumplir el presupuesto:
 | Cambio | Job | Minutos recuperados |
 |---|---|---|
+| Reducción del tiempo de carga constante en k6 de 10m a 4m | load | ~6:00 min |
+| Eliminación de descarga redundante de Chromium (`playwright install`) | e2e | ~1:30 min |
+| Eliminación de retardos arbitrarios (`sleep`) en scripts de prueba | smoke / e2e | ~0:15 min |
 
-Total resultante: [ ] min
-Link al run en main con los cambios:
+Total resultante: 6:04 min
+Link al run en main con los cambios: https://github.com/JuanBa15/INF384-lab4-dev-20216686/actions/runs/40962914215
 
 Riesgo aceptado (defecto de la aplicación concreto y efecto en la métrica DORA asignada):
+- **Defecto concreto de la aplicación**: Inyección de una vulnerabilidad de seguridad en las funciones de manejo de saldo/transferencia (`src/wallet.js`).
+- **Efecto en Time to Restore**: Si los controles de seguridad o pruebas profundas se omitieran o relajaran a modo puramente informativo para priorizar la velocidad del pipeline, este tipo de defectos llegaría a producción. Esto **aumentaría (empeoraría) la métrica Time to Restore**, ya que la detección tardía en producción requiere investigación forense, preparación de parches de emergencia y despliegue rápido bajo crisis, un proceso considerablemente más demorado que bloquear el cambio en la etapa de CI.
 
 Decisión sobre sast (se queda / se mueve a otra etapa o evento / informativo) y razón:
+- **Decisión**: Se queda en la etapa **pre-build** como compuerta bloqueante.
+- **Razón**: El job `sast` toma 2 min 40 s. Dado que la duración total optimizada del pipeline es de ~6:04 min (ampliamente por debajo del presupuesto asignado de 13 min), mantener SAST como compuerta síncrona no compromete el tiempo de entrega y previene la promoción de vulnerabilidades críticas. Esto protege directamente la métrica **Time to Restore**, reduciendo el riesgo de incidentes mayores en producción.
 
 ## Declaración de uso de IA
-Herramientas usadas y para qué:
+Herramientas usadas y para qué: Se usó Gemini para revisión y aclaración de lo que pedía el enunciado, así como ayudar a revisar algunos archivos para tener una mejor idea de cómo estaba construido el código. Las decisiones finales, cambios y completado de las respuestas no fue parte del trabajo de la IA.
