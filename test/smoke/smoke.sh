@@ -13,7 +13,7 @@ for i in $(seq 1 "$intentos"); do
     echo "::error::/salud no responde"
     exit 1
   fi
-  sleep 5
+  sleep 1
 done
 echo "salud: ${salud}"
 
@@ -27,7 +27,7 @@ if [ -n "${EXPECTED_COMMIT:-}" ]; then
       echo "::error::/version devuelve ${commit}, se esperaba ${EXPECTED_COMMIT}"
       exit 1
     fi
-    sleep 5
+    sleep 1
   done
   echo "commit: ${commit}"
 fi
