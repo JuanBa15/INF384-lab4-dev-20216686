@@ -51,9 +51,10 @@ function transferir(store, { origen, destino, monto } = {}) {
     throw new ErrorNegocio(400, 'usuario inexistente');
   }
   const centimos = aCentimos(monto);
-  if (cuentaOrigen.saldo < centimos) {
+  // DEFECTO INYECTADO: Se omite la validación de saldo suficiente
+  /*if (cuentaOrigen.saldo < centimos) {
     throw new ErrorNegocio(400, 'saldo insuficiente');
-  }
+  }*/
   const id = store.transferir(origen, destino, centimos);
   return {
     id,
