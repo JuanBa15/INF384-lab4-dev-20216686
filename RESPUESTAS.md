@@ -35,11 +35,11 @@ Presupuesto: 13 min  Métrica DORA:  time to restore
 - Evidencia (dato observado, con link al run o fragmento de la salida local):
 
 ## Parte 2 · Implementación
-- Link al run en verde en main:
-- Link al pull request:
-- Defecto de la aplicación introducido (archivo y descripción):
-- Job que debería detenerlo:
-- Link al run fallido:
+- Link al run en verde en main: https://github.com/JuanBa15/INF384-lab4-dev-20216686/actions/runs/40962927950
+- Link al pull request: parte 1: https://github.com/JuanBa15/INF384-lab4-dev-20216686/pull/3    parte 2: https://github.com/JuanBa15/INF384-lab4-dev-20216686/pull/4
+- Defecto de la aplicación introducido (archivo y descripción): src/wallet.js. Se comentó la validación cuentaOrigen.saldo < centimos dentro de la función transferir, permitiendo realizar transferencias monetarias aun cuando la cuenta origen no tiene saldo suficiente.
+- Job que debería detenerlo: unit (fallará la prueba unitaria 'transferir con saldo insuficiente es 400').
+- Link al run fallido: https://github.com/JuanBa15/INF384-lab4-dev-20216686/actions/runs/40964111146
 
 ## Parte 3 · Decisión bajo restricción
 Link al run medido:
