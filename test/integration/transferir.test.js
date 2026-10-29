@@ -11,10 +11,6 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { handler } = require('../../src/handler');
 
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { handler } = require('../../src/handler');
-
 async function llamar(metodo, ruta, cuerpo) {
   const r = await handler({
     rawPath: ruta,
