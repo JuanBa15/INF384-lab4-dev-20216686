@@ -12,7 +12,7 @@ Presupuesto: 13 min  Métrica DORA:  time to restore
 ### Defecto 2
 - Job y etapa: integration, etapa pre-build.
 - Problema que causa en el pipeline: Falta de aislamiento en /tmp/wallet.db. Las pruebas modifican saldos sin reiniciar la BD, provocando fallos en ejecuciones consecutivas por acumulación de estado.
-- Link al commit: https://github.com/JuanBa15/INF384-lab4-dev-20216686/commit/d61e2f1cb67c4b642ec52ae7e0dc768c8cb41f32
+- Link al commit: https://github.com/JuanBa15/INF384-lab4-dev-20216686/commit/8e2a862075ff0f5fa32747f445d9a3b5721ea223
 - Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Modificar tests
 - Evidencia (dato observado, con link al run o fragmento de la salida local):
 ### Defecto 3
