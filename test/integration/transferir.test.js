@@ -1,3 +1,16 @@
+const fs = require('node:fs');
+const path = require('node:path');
+
+// Limpieza inicial para asegurar aislamiento de estado entre ejecuciones
+const dbPath = process.env.DB_PATH || '/tmp/wallet.db';
+if (fs.existsSync(dbPath)) {
+  fs.unlinkSync(dbPath);
+}
+
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const { handler } = require('../../src/handler');
+
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { handler } = require('../../src/handler');
