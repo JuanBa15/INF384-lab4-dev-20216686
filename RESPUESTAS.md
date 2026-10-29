@@ -3,35 +3,35 @@ Alumno: 20216686
 Presupuesto: [ ] min  Métrica DORA: [ ]
 
 ## Parte 1 · Diagnóstico
-### Defecto 1
-- Job y etapa:
-- Problema que causa en el pipeline:
+### Defecto 1: Falta de ejecución en paralelo entre las pruebas iniciales
+- Job y etapa: sast y sca, o puede que sea la dependencia entre ellos, en la etapa pre-build
+- Problema que causa en el pipeline: Falta de optimización en el flujo de ejecución en paralelo de los análisis iniciales, lo que retrasa la entrada al job `build-push`.
 - Link al commit:
-- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests):
+- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Ajustar configuración
+- Evidencia (dato observado, con link al run o fragmento de la salida local): 
+### Defecto 2: Las pruebas de integración se ejecutan sin aislamiento en la base de datos
+- Job y etapa: integration en la etapa pre-build.
+- Problema que causa en el pipeline: Acoplamiento de estado en la base de datos SQLite entre pruebas sin limpieza de datos, ocasionando resultados no deterministas.
+- Link al commit:
+- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Modificar tests
 - Evidencia (dato observado, con link al run o fragmento de la salida local):
-### Defecto 2
-- Job y etapa:
-- Problema que causa en el pipeline:
+### Defecto 3: Instalación redundante o innecesaria de navegadores en test:e2e
+- Job y etapa: e2e en la etapa post-deploy.
+- Problema que causa en el pipeline: Descarga e instalación innecesaria del navegador Chromium (`playwright install`) para pruebas que son 100% de API HTTP, desperdiciando tiempo del pipeline.
 - Link al commit:
-- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests):
+- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Eliminar / Ajustar configuración
 - Evidencia (dato observado, con link al run o fragmento de la salida local):
-### Defecto 3
-- Job y etapa:
-- Problema que causa en el pipeline:
+### Defecto 4: Script de pruebas de humo sin tolerancia a fallos transitorios / bucle de espera bloqueante
+- Job y etapa: smoke en la etapa post-deploy.
+- Problema que causa en el pipeline: Tiempos de espera excesivos en los reintentos de polling del script `smoke.sh` y en la obtención de la URL de Lambda, ralentizando la verificación post-despliegue.
 - Link al commit:
-- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests):
+- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Ajustar configuración / Modificar tests
 - Evidencia (dato observado, con link al run o fragmento de la salida local):
-### Defecto 4
-- Job y etapa:
-- Problema que causa en el pipeline:
+### Defecto 5: Redundancia de comandos y falta de uso eficiente del script en package.json
+- Job y etapa: unit e integration en la etapa pre-build.
+- Problema que causa en el pipeline: Descarga redundante e instalación desacoplada de dependencias en cada job individual sin optimizar el uso de caché o scripts del paquete.
 - Link al commit:
-- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests):
-- Evidencia (dato observado, con link al run o fragmento de la salida local):
-### Defecto 5
-- Job y etapa:
-- Problema que causa en el pipeline:
-- Link al commit:
-- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests):
+- Corrección (una o más: mover de etapa / dejar como informativo / eliminar / ajustar configuración / modificar tests): Ajustar configuración
 - Evidencia (dato observado, con link al run o fragmento de la salida local):
 
 ## Parte 2 · Implementación
